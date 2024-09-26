@@ -7,8 +7,8 @@ require('dotenv').config({path:".env"});
 const port = process.env.PORT;
 
 let servers = [
-    { ipServer: process.env.IP_SERVER1, portServer: process.env.PORT_SERVER1, petitions: 0, failed:false},
-    { ipServer: process.env.IP_SERVER2, portServer: process.env.PORT_SERVER2, petitions: 0, failed:false}];
+    { ipServer: process.env.IP_SERVER1, portServer: process.env.PORT_SERVER1, petitions: 0 },
+    { ipServer: process.env.IP_SERVER2, portServer: process.env.PORT_SERVER2, petitions: 0 }];
 
 
 app.use(express.json());
@@ -26,19 +26,14 @@ setInterval(() => {
 }, 60000);
 
 function getLeastConnectedServer() {
-    let server = undefined;
-    let i = 0;
-
-    for (i = 0; i < servers.length; i++) {
+    let server = servers[0];
+    for (let i = 0; i < servers.length; i++) {
         if (i+1 < servers.length) {
-            if (server.petitions > servers[i+1].petitions && !servers[i+1].failed) {
+            if (server.petitions > servers[i+1].petitions) {
                 server = servers[i+1]
             }
         }
     }
-    
-
-
     return server;
 };
 
