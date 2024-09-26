@@ -17,6 +17,10 @@ app.post('/countTokens', (req, res) => {
     res.send({ tokenCount: tokens.length });
 });
 
+app.get('/isReady', (req, res) => {
+    res.send({ answer: 'yes' });
+});
+
 app.listen(port, () => {
     console.log(`Servidor corriendo en el puerto ${port}`);
 });

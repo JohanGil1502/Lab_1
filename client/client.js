@@ -11,7 +11,7 @@ createApp({
     },
     methods: {
         async countTokens() {
-            fetch(`http://localhost:5000/countTokens`, {
+            await fetch(`http://localhost:5000/countTokens`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -20,6 +20,9 @@ createApp({
             })
                 .then((response) => response.json())
                 .then((text) => this.tokens = text.tokenCount)
+            if (tokens === 0) {
+                tokens = "Los servidores están caidos"
+            }
         }
     }
 }).mount("#app");
