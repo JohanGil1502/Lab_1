@@ -7,8 +7,8 @@ require('dotenv').config({path:".env"});
 const port = process.env.PORT;
 
 let servers = [
-    { ipServer: process.env.IP_SERVER1, portServer: process.env.PORT_SERVER1, petitions: 0 },
-    { ipServer: process.env.IP_SERVER2, portServer: process.env.PORT_SERVER2, petitions: 0 }];
+    { ipServer: process.env.IP_SERVER1, portServer: process.env.PORT_SERVER1, petitions: 0, failed:false},
+    { ipServer: process.env.IP_SERVER2, portServer: process.env.PORT_SERVER2, petitions: 0, failed:false}];
 
 
 app.use(express.json());
@@ -26,7 +26,20 @@ setInterval(() => {
 }, 60000);
 
 function getLeastConnectedServer() {
-    return servers[0];
+    let server = undefined;
+    let i = 0;
+
+    for (i = 0; i < servers.length; i++) {
+        if (i+1 < servers.length) {
+            if (server.petitions > servers[i+1].petitions && !servers[i+1].failed) {
+                server = servers[i+1]
+            }
+        }
+    }
+    
+
+
+    return server;
 };
 
 app.post('/countTokens', async (req, res) => {
@@ -34,25 +47,26 @@ app.post('/countTokens', async (req, res) => {
     availableServer = getLeastConnectedServer();
     availableServer.petitions++;
     console.log(availableServer)
-    text1 = "";
     try {
-        // Aquí harías la petición al servidor para contar tokens
-        fetch(`http://${availableServer.ipServer}:${availableServer.portServer}/countTokens`, {
+        const response = await fetch(`http://${availableServer.ipServer}:${availableServer.portServer}/countTokens`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({text: req.body.text})
-        })
-        .then((response) => response.json())
-        .then((text) => this.text1 = text.tokenCount)
-        console.log("respuesta"+text1)
-        //return res.send(response.data); // Retorna la respuesta del servidor
+        });
+
+        const data = await response.json();
+        
+        console.log("respuesta recibida")
+        console.log(data)
+
+        return res.send(data);
     } catch (error) {
+        console.log("Ocurrió un error")
         console.log(error)
     }
-    console.log("snwede");
-    // Si ningún servidor responde
+    console.log("Petición NO realizada");
 });
 app.listen(port, () => {
     console.log(`Servidor escuchando en http://localhost:${port}`);
