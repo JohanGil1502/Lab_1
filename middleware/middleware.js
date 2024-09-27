@@ -25,9 +25,9 @@ setInterval(() => {
     console.log('Estadísticas de peticiones reiniciadas.');
 }, 60000);
 
+
 async function getLeastConnectedServer() {
     let server = null;
-
     const serverAvaible= servers.filter(up => !up.failed)
     if (serverAvaible.length===0){
         return null
@@ -61,6 +61,29 @@ async function getLeastConnectedServer() {
     }
 };
 
+setInterval(async () => {
+    console.log("revisando servidores caidos")
+    for (let server of servers) {
+        if (server.failed) {
+            try {
+                const response = await fetch(`http://${server.ipServer}:${server.portServer}/isReady`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+
+                const data = await response.json()
+                if (data.answer === 'yes') {
+                    console.log(`sevidor ${server.portServer} ha vuelto a estar disponible`);
+                    server.failed = false; 
+                }
+            } catch (error) {
+                console.log(`servidor ${server.portServer} sigue caido`)
+            }
+        }
+    }
+}, 5000); 
 
 app.post('/countTokens', async (req, res) => {
     let availableServer;
@@ -91,7 +114,7 @@ app.post('/countTokens', async (req, res) => {
         console.log("Petición NO realizada");
     } else {
         console.log("no hay servidores disponibles")
-        return res.send({ info: 'servidor caido',
+        return res.send({ info: 'servidores caidos',
                           tokenCount: 0 });
     }
 });
