@@ -20,21 +20,22 @@ app.put('/addServer', async (req, res) => {
 
 setInterval(() => {
     servers.forEach(server => {
-        server.petitions = 0;
-    });
+        server.petitions = 0
+    })
     console.log('Estadísticas de peticiones reiniciadas.');
 }, 60000);
 
 async function getLeastConnectedServer() {
     let server = null;
 
-    for (let i = 0; i < servers.length; i++) {
-        if (!server || (servers[i].petitions < server.petitions && !servers[i].failed)) {
-            if (!servers[i].failed) {
-                server = servers[i];
-            } else {
-                server = servers[i + 1];
-            }
+    const serverAvaible= servers.filter(up => !up.failed)
+    if (serverAvaible.length===0){
+        return null
+    }
+
+    for (let i = 0; i < serverAvaible.length; i++) {
+        if (!server || serverAvaible[i].petitions < server.petitions ) {
+            server = serverAvaible[i]
         }
     }
 
@@ -89,7 +90,9 @@ app.post('/countTokens', async (req, res) => {
         }
         console.log("Petición NO realizada");
     } else {
-        return res.send({ tokenCount: 0 });
+        console.log("no hay servidores disponibles")
+        return res.send({ info: 'servidor caido',
+                          tokenCount: 0 });
     }
 });
 app.listen(port, () => {

@@ -20,9 +20,6 @@ createApp({
             })
                 .then((response) => response.json())
                 .then((text) => this.tokens = text.tokenCount)
-            if (tokens === 0) {
-                tokens = "Los servidores están caidos"
-            }
         }
     }
 }).mount("#app");
