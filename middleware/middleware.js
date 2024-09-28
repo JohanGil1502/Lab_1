@@ -25,6 +25,15 @@ setInterval(() => {
     console.log('Estadísticas de peticiones reiniciadas.');
 }, 60000);
 
+
+function resetServers() {
+    servers.forEach(element => {
+        element.failed = false;
+    });
+}
+
+let serversFailed = 0;
+
 async function getLeastConnectedServer() {
     let server = null;
 
@@ -38,6 +47,11 @@ async function getLeastConnectedServer() {
         }
     }
 
+    if (serversFailed == servers.length) {
+        serversFailed = 0;
+        resetServers();
+        return undefined
+    }
 
     console.log(server)
     let text = "";
@@ -52,9 +66,11 @@ async function getLeastConnectedServer() {
             .then((response) => response.json())
             .then((data) => text = data.answer)
         console.log(text)
+        resetServers();
         return server;
     } catch (error) {
         console.log("Error, servidor caido")
+        serversFailed++;
         server.failed = true;
         return await getLeastConnectedServer();
     }
