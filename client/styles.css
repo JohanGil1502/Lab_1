@@ -16,6 +16,13 @@ body {
     width: 100%;
 }
 
+#info{
+    font-size: 20px;
+    margin-bottom: 20px;
+    color:  rgb(94, 94, 94);
+    font-weight: bold;
+}
+
 
 form {
     background-color: white;

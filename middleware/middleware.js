@@ -114,7 +114,7 @@ app.post('/countTokens', async (req, res) => {
         console.log("Petición NO realizada");
     } else {
         console.log("no hay servidores disponibles")
-        return res.send({ info: 'servidores caidos',
+        return res.send({ info: 'Todos los servidores están caidos :(',
                           tokenCount: 0 });
     }
 });

@@ -4,18 +4,16 @@ createApp({
     data() {
         const tokens = "";
         const words = "";
+        const info = "";
         return {
             tokens,
-            words
+            words,
+            info
         };
     },
     methods: {
-        checkTokens(text){
-            if(text.tokenCount == 0){
-                this.tokens = text.info
-            }else{
-                this.tokens = text.tokenCount
-            }
+        checkTokens(text) {
+            text.tokenCount === 0 ? (this.tokens = "", this.info = text.info): (this.tokens = text.tokenCount, this.info = text.info);
         },
         async countTokens() {
             await fetch(`http://localhost:5000/countTokens`, {
@@ -27,11 +25,6 @@ createApp({
             })
                 .then((response) => response.json())
                 .then((text) => this.checkTokens(text))
-            /*
-            if (this.tokens === 0) {
-                this.tokens = "Los servidores están caidos"
-            }
-            */
         }
     }
 }).mount("#app");
