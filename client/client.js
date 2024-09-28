@@ -10,6 +10,13 @@ createApp({
         };
     },
     methods: {
+        checkTokens(text){
+            if(text.tokenCount == 0){
+                this.tokens = text.info
+            }else{
+                this.tokens = text.tokenCount
+            }
+        },
         async countTokens() {
             await fetch(`http://localhost:5000/countTokens`, {
                 method: 'POST',
@@ -19,7 +26,12 @@ createApp({
                 body: JSON.stringify({text: this.words})
             })
                 .then((response) => response.json())
-                .then((text) => this.tokens = text.tokenCount)
+                .then((text) => this.checkTokens(text))
+            /*
+            if (this.tokens === 0) {
+                this.tokens = "Los servidores están caidos"
+            }
+            */
         }
     }
 }).mount("#app");
