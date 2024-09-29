@@ -1,18 +1,19 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const path = require('path');
+
 require('dotenv').config({ path: ".env" });
-
-
-const port = process.env.PORT;
-
-let servers = [
-    { ipServer: process.env.IP_SERVER1, portServer: process.env.PORT_SERVER1, petitions: 0, failed: false },
-    { ipServer: process.env.IP_SERVER2, portServer: process.env.PORT_SERVER2, petitions: 0, failed: false }];
-
 
 app.use(express.json());
 app.use(cors());
+app.use(express.static(path.join(__dirname, 'monitor')));
+
+const port = process.env.PORT;
+let servers = [
+    { ipServer: process.env.IP_SERVER1, portServer: process.env.PORT_SERVER1, petitions: 0, failed: false },
+    { ipServer: process.env.IP_SERVER2, portServer: process.env.PORT_SERVER2, petitions: 0, failed: false }];
+let serversLogs = [];
 
 app.put('/addServer', async (req, res) => {
 
@@ -62,7 +63,7 @@ async function getLeastConnectedServer() {
 };
 
 setInterval(async () => {
-    console.log("revisando servidores caidos")
+    // console.log("revisando servidores caidos")
     for (let server of servers) {
         if (server.failed) {
             try {
@@ -83,7 +84,7 @@ setInterval(async () => {
             }
         }
     }
-}, 5000); 
+}, 1000); 
 
 app.post('/countTokens', async (req, res) => {
     let availableServer;
@@ -118,6 +119,28 @@ app.post('/countTokens', async (req, res) => {
                           tokenCount: 0 });
     }
 });
+
+app.get('/sendLogs', async (req, res) => {
+    serversLogs = [];
+    for (const server of servers) {
+        if (!server.failed) {
+            try {
+                const response = await fetch(`http://${server.ipServer}:${server.portServer}/sendLogs`);
+                if (!response.ok) {
+                    console.error(`Error en la respuesta: ${response.statusText}`);
+                    continue;
+                }
+                const logs = await response.json();
+                console.log("Mostrando data",logs)
+                serversLogs.push({server, logs: logs});
+            } catch (error) {
+                console.error(`Error al solicitar logs: ${error.message}`);
+            }
+        }
+    }
+    res.send(serversLogs);
+});
+
 app.listen(port, () => {
     console.log(`Servidor escuchando en http://localhost:${port}`);
 });

@@ -25,7 +25,7 @@ app.listen(port, () => {
     addLog(`Servidor corriendo en el puerto ${port}`,"");
 });
 
-app.post('/sendLogs', (req, res) => {
+app.get('/sendLogs', (req, res) => {
     addLog("Enviando array de logs","")
     res.send(logs);
 });

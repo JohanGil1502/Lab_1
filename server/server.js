@@ -21,7 +21,7 @@ app.get('/isReady', (req, res) => {
     res.send({ answer: 'yes' });
 });
 
-app.post('/sendLogs', (req, res) => {
+app.get('/sendLogs', (req, res) => {
     addLog("Enviando array de logs","")
     res.send(logs);
 });
