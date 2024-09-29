@@ -15,8 +15,45 @@ let servers = [
     { ipServer: process.env.IP_SERVER2, portServer: process.env.PORT_SERVER2, petitions: 0, failed: false }];
 let serversLogs = [];
 
-app.put('/addServer', async (req, res) => {
+async function obtainServers(){
+    try {
+        const response = await fetch("http://localhost:3000/servers");
+        console.log("Solicitando servidores al discovery_Server");
+        const listServers = await response.json(); 
+        listServers.forEach(element => {
+            servers.push({ipServer:element.ipServer, portServer: element.portServer, petitions:0, failed: false})
+        });
+        console.log("Servidores actualizados\n", show_servers(servers));
 
+    } catch (error) {
+        console.error("El discovery_Server no está activo");
+    }
+}
+
+function show_servers(servers){
+    let message ="";
+    for (let index = 0; index < servers.length; index++) {
+        const element = servers[index];
+        message += "servidor " +  (index+1) + ":" + " ip= " + element.ipServer + " puerto= " + element.portServer + "\n"    
+    }
+    return message;
+}
+
+obtainServers();
+
+app.put('/addServer', async (req, res) => {
+    const data = req.body;
+    console.log("Servidor para agregar: " , "ip:" , data.ip, "puerto:" , data.port);
+    const serverFound = servers.find(server => server.ipServer === data.ip && server.portServer === data.port);
+    if (serverFound) {
+        serverFound.failed = false
+        res.send({answer: "Conexión realizada"})
+        console.log(`Servidor de ip ${data.ip} y de puerto ${data.port} está en linea de nuevo`)
+    }else{
+        servers.push({ipServer:data.ip, portServer: data.port, petitions:0, failed: false})
+        res.send({answer: "Conexión realizada"})
+        console.log(`El servidor de ip ${data.ip} y de puerto ${data.port} fue agregado`)
+    }
 });
 
 setInterval(() => {
@@ -125,6 +162,7 @@ app.get('/sendLogs', async (req, res) => {
     for (const server of servers) {
         if (!server.failed) {
             try {
+                console.log(`haciendo fetch al sevidor ${server.ipServer}:${server.portServer}`)
                 const response = await fetch(`http://${server.ipServer}:${server.portServer}/sendLogs`);
                 if (!response.ok) {
                     console.error(`Error en la respuesta: ${response.statusText}`);

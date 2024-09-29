@@ -1,3 +1,5 @@
 /middleware/node_modules/
 /server/node_modules/
-/server copy/node_modules/
+/server2/node_modules/
+/server_to_register/node_modules/
+/discovery_server/node_modules/
