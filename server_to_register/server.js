@@ -3,7 +3,7 @@ const natural = require('natural');
 const cors = require('cors')
 const app = express();
 const port = process.env.PORT;
-require('dotenv').config({path: ".env" });
+const ip = process.env.IP_CONNECT;
 const logs = [];
 
 app.use(cors());
@@ -12,7 +12,7 @@ app.use(express.json());
 async function connect() {
     console.log("Realizando conexión")
     let answer = "";
-    await fetch('http://localhost:3000/addServer', {
+    await fetch(`http://${ip}:3000/addServer`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'

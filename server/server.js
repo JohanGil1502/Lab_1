@@ -2,7 +2,7 @@ const express = require('express');
 const natural = require('natural');
 const cors = require('cors')
 const app = express();
-const port = 4001;
+const port = process.env.PORT;
 const logs = [];
 
 app.use(cors());
